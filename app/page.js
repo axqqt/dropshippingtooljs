@@ -6,16 +6,27 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const baseURL = "http://localhost:5000";
+  const [status,setStatus] = useState("")
 
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${baseURL}/api/search`, { prompt });
-      setProducts(response.data);
+      const response = await axios.post(`/api/search`, { prompt });
+      if(response.status===404){
+        setStatus("No results found")
+      }else if (response.status===200){
+        setStatus("Saved!")
+      }
+      if (Array.isArray(response.data)) {
+        setProducts(response.data);
+      } else {
+        console.error("Unexpected response format:", response.data);
+        setProducts([]);
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
+      setStatus("Error fetching products:", error);
+      setProducts([]);
     }
     setLoading(false);
   };
@@ -31,8 +42,8 @@ export default function Home() {
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            style={{ color: "black" }}
             placeholder="Enter product prompt"
+            style={{color:"black"}}
             className="mb-4 p-2 border border-gray-300 rounded"
           />
           <button
@@ -42,19 +53,24 @@ export default function Home() {
           >
             {loading ? "Searching..." : "Search"}
           </button>
+          <h1>{status}</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((product, index) => (
-              <div key={index} className="border p-4 rounded">
-                <img
-                  src={product["Image Src"]}
-                  alt={product.Title}
-                  className="mb-2 w-full h-40 object-cover"
-                />
-                <h2 className="text-lg font-bold">{product.Title}</h2>
-                <p dangerouslySetInnerHTML={{ __html: product["Body (HTML)"] }}></p>
-                <p className="font-bold">{product["Variant Price"]}</p>
-              </div>
-            ))}
+            {Array.isArray(products) && products.length > 0 ? (
+              products.map((product, index) => (
+                <div key={index} className="border p-4 rounded">
+                  <img
+                    src={product["Image Src"]}
+                    alt={product.Title}
+                    className="mb-2 w-full h-40 object-cover"
+                  />
+                  <h2 className="text-lg font-bold">{product.Title}</h2>
+                  <p dangerouslySetInnerHTML={{ __html: product["Body (HTML)"] }}></p>
+                  <p className="font-bold">{product["Variant Price"]}</p>
+                </div>
+              ))
+            ) : (
+              <p>No products found.</p>
+            )}
           </div>
         </div>
       )}
