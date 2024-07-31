@@ -131,7 +131,3 @@ export async function POST(req) {
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
   }
 }
-
-export async function GET() {
-  return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
-}
