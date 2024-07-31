@@ -6,26 +6,23 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status,setStatus] = useState("")
+  const [status, setStatus] = useState("");
 
   const handleSearch = async () => {
     setLoading(true);
+    setStatus("");
     try {
-      const response = await axios.post(`/api/search`, { prompt });
-      if(response.status===404){
-        setStatus("No results found")
-      }else if (response.status===200){
-        setStatus("Saved!")
-      }
-      if (Array.isArray(response.data)) {
+      const response = await axios.post('http://localhost:5000/api/search', { prompt });
+      if (response.status === 200) {
+        setStatus("Results found!");
         setProducts(response.data);
-      } else {
-        console.error("Unexpected response format:", response.data);
+      } else if (response.status === 404) {
+        setStatus("No results found.");
         setProducts([]);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      setStatus("Error fetching products:", error);
+      setStatus("Error fetching products.");
       setProducts([]);
     }
     setLoading(false);
@@ -43,7 +40,6 @@ export default function Home() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Enter product prompt"
-            style={{color:"black"}}
             className="mb-4 p-2 border border-gray-300 rounded"
           />
           <button
