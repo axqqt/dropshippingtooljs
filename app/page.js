@@ -51,7 +51,7 @@ export default function Home() {
                   className="mb-2 w-full h-40 object-cover"
                 />
                 <h2 className="text-lg font-bold">{product.Title}</h2>
-                <p>{product["Body (HTML)"]}</p>
+                <p dangerouslySetInnerHTML={{ __html: product["Body (HTML)"] }}></p>
                 <p className="font-bold">{product["Variant Price"]}</p>
               </div>
             ))}
