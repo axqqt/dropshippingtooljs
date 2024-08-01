@@ -1,23 +1,36 @@
-// /app/api/images/route.js
-
 "use server";
 
 import { GoogleAuth } from 'google-auth-library';
-import { GenerativeLanguageServiceClient } from '@google-cloud/generative-language';
+import { GenerativeServiceClient } from '@google-ai/generativelanguage';
 import dotenv from 'dotenv';
-import path from 'path';
+import formidable from 'formidable';
+import fs from 'fs';
 
 dotenv.config();
 
-const handler = async (req, res) => {
-  if (req.method === 'POST') {
+export const POST = async (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      res.status(500).json({ error: 'Error parsing the file' });
+      return;
+    }
+
+    const file = files.file;
+
+    if (!file) {
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
+    }
+
     try {
       const auth = new GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/cloud-platform']
+        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
       });
 
-      const client = new GenerativeLanguageServiceClient({
-        auth
+      const client = new GenerativeServiceClient({
+        auth,
       });
 
       const generationConfig = {
@@ -36,22 +49,28 @@ const handler = async (req, res) => {
                 properties: {
                   recipe_name: {
                     type: 'string',
-                    description: 'name of the recipe'
-                  }
-                }
-              }
-            }
-          }
+                    description: 'name of the recipe',
+                  },
+                  ingredients: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
-        response_mime_type: 'application/json'
+        response_mime_type: 'application/json',
       };
 
       const [response] = await client.generateText({
         modelName: 'gemini-1.5-flash',
         generationConfig,
         prompt: {
-          text: 'Generate a list of cookie recipes in JSON format.'
-        }
+          text: 'Generate a list of cookie recipes in JSON format.',
+        },
       });
 
       const recipes = JSON.parse(response.text);
@@ -60,10 +79,11 @@ const handler = async (req, res) => {
       console.error('Error generating recipes:', error);
       res.status(500).json({ error: 'Error generating recipes' });
     }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
+  });
 };
 
-export default handler;
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

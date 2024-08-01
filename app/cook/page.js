@@ -1,11 +1,12 @@
-"use client"
+"use client";
+
 import { useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 
 export default function Home() {
   const [image, setImage] = useState(null);
-  const [ingredients, setIngredients] = useState([]);
+  const [recipes, setRecipes] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
 
@@ -32,7 +33,7 @@ export default function Home() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setIngredients(response.data.ingredients);
+      setRecipes(response.data.recipes);
       setError(null);
     } catch (error) {
       console.error('Error analyzing image:', error);
@@ -41,7 +42,7 @@ export default function Home() {
       } else {
         setError('An error occurred while analyzing the image. Please try again.');
       }
-      setIngredients([]);
+      setRecipes([]);
     }
   };
 
@@ -65,13 +66,20 @@ export default function Home() {
           <Image src={image} alt="Uploaded recipe" width={300} height={300} />
         </div>
       )}
-      {ingredients.length > 0 && (
+      {recipes.length > 0 && (
         <div>
-          <h2>Ingredients:</h2>
+          <h2>Recipes:</h2>
           <ul>
-            {ingredients.map((ingredient, index) => (
+            {recipes.map((recipe, index) => (
               <li key={index}>
-                {ingredient} - <a href={`https://www.amazon.com/s?k=${ingredient}`} target="_blank" rel="noopener noreferrer">Buy on Amazon</a>
+                <h3>{recipe.recipe_name}</h3>
+                <ul>
+                  {recipe.ingredients.map((ingredient, idx) => (
+                    <li key={idx}>
+                      {ingredient} - <a href={`https://www.amazon.com/s?k=${ingredient}`} target="_blank" rel="noopener noreferrer">Buy on Amazon</a>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>

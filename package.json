@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-ai/generativelanguage": "^2.6.0",
     "@google/generative-ai": "^0.16.0",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0-rc.12",
@@ -16,6 +17,7 @@
     "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "formidable": "^3.5.1",
+    "google-auth-library": "^9.13.0",
     "json2csv": "^6.0.0-alpha.2",
     "next": "14.2.5",
     "react": "^18",
