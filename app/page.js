@@ -40,6 +40,7 @@ export default function Home() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Enter product prompt"
+            style={{color:"black"}}
             className="mb-4 p-2 border border-gray-300 rounded"
           />
           <button
