@@ -8,14 +8,20 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
+  const baseURLPython  = "http://localhost:5000"
+
   const handleSearch = async () => {
     setLoading(true);
     setStatus("");
     try {
-      const response = await axios.post('http://localhost:5000/api/search', { prompt });
+      const response = await axios.post(`${baseURLPython}/api/search`, { prompt });
       if (response.status === 200) {
-        setStatus("Results found!");
-        setProducts(response.data);
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setProducts(response.data);
+        } else {
+          setStatus("No valid products found in the response.");
+          setProducts([]);
+        }
       } else if (response.status === 404) {
         setStatus("No results found.");
         setProducts([]);
