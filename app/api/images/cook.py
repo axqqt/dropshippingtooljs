@@ -1,9 +1,10 @@
 import os
 import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
+import json
 
-def configure_model():
-    genai.configure(api_key=os.environ["AIzaSyDzUMB9-zViLm0Ltar3GcqsjpJHQiAgeIE"])
+def generate_recipes():
+    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
     generation_config = {
         "temperature": 1,
@@ -34,13 +35,8 @@ def configure_model():
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
         generation_config=generation_config,
-        # safety_settings = Adjust safety settings
-        # See https://ai.google.dev/gemini-api/docs/safety-settings
     )
-    return model
 
-def generate_recipes():
-    model = configure_model()
     chat_session = model.start_chat(
         history=[
             {
@@ -52,14 +48,15 @@ def generate_recipes():
             {
                 "role": "model",
                 "parts": [
-                    "{\n\"recipes\": [\n{\n\"recipe_name\": \"Classic Chocolate Chip Cookies\"\n},\n{\n\"recipe_name\": \"Chewy Sugar Cookies\"\n},\n{\n\"recipe_name\": \"Peanut Butter Cookies\"\n},\n{\n\"recipe_name\": \"Snickerdoodles\"\n},\n{\n\"recipe_name\": \"Oatmeal Raisin Cookies\"\n}\n]\n} ",
+                    '{"recipes": [{"recipe_name": "Classic Chocolate Chip Cookies"}, {"recipe_name": "Chewy Sugar Cookies"}, {"recipe_name": "Peanut Butter Cookies"}, {"recipe_name": "Snickerdoodles"}, {"recipe_name": "Oatmeal Raisin Cookies"}]}',
                 ],
             },
         ]
     )
 
-    response = chat_session.send_message("INSERT_INPUT_HERE")
+    response = chat_session.send_message("Generate a list of cookie recipes in JSON format.")
     return response.text
 
 if __name__ == "__main__":
-    print(generate_recipes())
+    recipes = generate_recipes()
+    print(json.dumps(recipes))
