@@ -4,7 +4,7 @@ from google.ai.generativelanguage_v1beta.types import content
 import json
 
 def generate_recipes():
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    genai.configure(api_key=os.environ["AIzaSyDzUMB9-zViLm0Ltar3GcqsjpJHQiAgeIE"])
 
     generation_config = {
         "temperature": 1,
